@@ -13,14 +13,14 @@ import static org.junit.Assert.*;
 
 public class TestRobustIterator extends TestSimpleIterator {
     @Override
-    protected SimpleIterator<Integer, Int> newIteratorFrom(final Tree<Integer, Int> tree) {
+    protected RobustIterator<Integer, Int> newIteratorFrom(final Tree<Integer, Int> tree) {
         return tree.createRobustIterator();
     }
 
     @Test
     public void canAddAfter() {
         tree.add(new Int(1));
-        SimpleIterator iterator = newIteratorFrom(tree);
+        RobustIterator iterator = newIteratorFrom(tree);
         iterator.reset();
 
         assertTrue(iterator.isNotDone());
@@ -40,7 +40,7 @@ public class TestRobustIterator extends TestSimpleIterator {
     @Test
     public void canAddBefore() {
         tree.add(new Int(1));
-        SimpleIterator iterator = newIteratorFrom(tree);
+        RobustIterator iterator = newIteratorFrom(tree);
         iterator.reset();
 
         assertTrue(iterator.isNotDone());
@@ -56,7 +56,7 @@ public class TestRobustIterator extends TestSimpleIterator {
     public void canRemoveBefore() {
         tree.add(new Int(1));
         tree.add(new Int(2));
-        SimpleIterator iterator = newIteratorFrom(tree);
+        RobustIterator iterator = newIteratorFrom(tree);
         iterator.reset();
 
         assertTrue(iterator.isNotDone());
@@ -77,7 +77,7 @@ public class TestRobustIterator extends TestSimpleIterator {
     public void canRemoveAfter() {
         tree.add(new Int(2));
         tree.add(new Int(1));
-        SimpleIterator iterator = newIteratorFrom(tree);
+        RobustIterator iterator = newIteratorFrom(tree);
         iterator.reset();
 
         assertTrue(iterator.isNotDone());
@@ -96,7 +96,7 @@ public class TestRobustIterator extends TestSimpleIterator {
     @Test
     public void canRemoveThisOne() {
         tree.add(new Int(1));
-        SimpleIterator iterator = newIteratorFrom(tree);
+        RobustIterator iterator = newIteratorFrom(tree);
         iterator.reset();
 
         assertTrue(iterator.isNotDone());
@@ -104,6 +104,7 @@ public class TestRobustIterator extends TestSimpleIterator {
 
         tree.remove(1);
 
+        iterator.next();
         assertFalse(iterator.isNotDone());
     }
 
@@ -112,7 +113,7 @@ public class TestRobustIterator extends TestSimpleIterator {
         tree.add(new Int(2));
         tree.add(new Int(1));
         tree.add(new Int(3));
-        SimpleIterator iterator = newIteratorFrom(tree);
+        RobustIterator iterator = newIteratorFrom(tree);
         iterator.reset();
         iterator.next();
 
@@ -121,11 +122,29 @@ public class TestRobustIterator extends TestSimpleIterator {
 
         tree.remove(2);
 
+        iterator.next();
         assertTrue(iterator.isNotDone());
         assertSame(tree.find(3), iterator.getCurrent());
 
         iterator.next();
 
         assertFalse(iterator.isNotDone());
+    }
+
+
+    @Test
+    public void canRemoveAllInCycle() {
+        final int[] arr = new int[] {4, 87, 12, 2, 5};
+        for (int i : arr) tree.add(new Int(i));
+        RobustIterator<Integer, Int> iterator = newIteratorFrom(tree);
+        iterator.reset();
+
+        while (iterator.isNotDone()) {
+            Int current = iterator.getCurrent();
+            tree.remove(current.getKey());
+            iterator.next();
+        }
+
+        assertEquals(0, tree.size());
     }
 }

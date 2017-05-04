@@ -1,6 +1,7 @@
 package tree;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Tree< K extends Comparable, T extends IHasKey<K> > {
@@ -8,10 +9,14 @@ public class Tree< K extends Comparable, T extends IHasKey<K> > {
     private Node<K, T> root = null;
     private final List<RobustIterator<K, T> > iterators = new ArrayList<>();
 
-    private void correctRobustIteratorsBeforeRemove(final K key) {
-        iterators.stream().filter(iterator ->
-                iterator.getCurrent().getKey() == key
-        ).forEach(RobustIterator::next);
+    private void correctRobustIteratorsBeforeRemove(final K key, final Node<K,T> minimum) {
+        for (RobustIterator<K,T> iterator : iterators) {
+            if (iterator.getCurrent().getKey() == key) {
+                if (iterator.getNode() == minimum)
+                    iterator.need_reset_on_next = true;
+                iterator.prev();
+            }
+        }
     }
 
     public void add(final T data) {
@@ -26,14 +31,14 @@ public class Tree< K extends Comparable, T extends IHasKey<K> > {
         Node new_root = null;
         if (size != 0) {
             if (size != 1) {
-                correctRobustIteratorsBeforeRemove(key);
+                correctRobustIteratorsBeforeRemove(key, Node.minimum(root));
                 new_root = Node.remove(root, key);
                 if (new_root == null)
                     throw new IllegalArgumentException("key not found");
             } else {
                 if (!root.data.getKey().equals(key))
                     throw new IllegalArgumentException("key not found");
-                correctRobustIteratorsBeforeRemove(key);
+                correctRobustIteratorsBeforeRemove(key, Node.minimum(root));
             }
             root = new_root;
             --size;
@@ -46,6 +51,14 @@ public class Tree< K extends Comparable, T extends IHasKey<K> > {
         Node next = Node.next(root, key);
         if (next != null)
             return (T) next.data;
+        else
+            return null;
+    }
+
+    public T prev(final Comparable key) {
+        Node prev = Node.prev(root, key);
+        if (prev != null)
+            return (T) prev.data;
         else
             return null;
     }

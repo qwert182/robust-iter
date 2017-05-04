@@ -45,6 +45,19 @@ class Node< K extends Comparable, T extends IHasKey<K>  > {
         return searchResult.found;
     }
 
+    static Node prev(final Node root, final Comparable key) {
+        Node node = root, last_smaller = null;
+        while (node != null) {
+            int compare_result = node.data.getKey().compareTo(key);
+            if (compare_result < 0) {
+                last_smaller = node;
+                node = node.right;
+            } else
+                node = node.left;
+        }
+        return last_smaller;
+    }
+
     static Node next(final Node root, final Comparable key) {
         Node node = root, last_bigger = null;
         while (node != null) {

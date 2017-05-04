@@ -24,4 +24,12 @@ public class SimpleIterator< K extends Comparable, T extends IHasKey<K> > {
     public void next() {
         node = Node.next(tree.getRoot(), node.data.getKey());
     }
+
+    void prev() {
+        node = Node.prev(tree.getRoot(), node.data.getKey());
+    }
+
+    Node<K, T> getNode() {
+        return node;
+    }
 }
