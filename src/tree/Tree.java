@@ -11,7 +11,7 @@ public class Tree< K extends Comparable, T extends IHasKey<K> > {
 
     private void correctRobustIteratorsBeforeRemove(final K key, final Node<K,T> minimum) {
         for (RobustIterator<K,T> iterator : iterators) {
-            if (iterator.getCurrent().getKey() == key) {
+            if (iterator.isNotDone() && iterator.getCurrent().getKey() == key) {
                 if (iterator.getNode() == minimum)
                     iterator.need_reset_on_next = true;
                 iterator.prev();

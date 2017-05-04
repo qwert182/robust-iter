@@ -32,4 +32,12 @@ public class SimpleIterator< K extends Comparable, T extends IHasKey<K> > {
     Node<K, T> getNode() {
         return node;
     }
+
+    @Override
+    public String toString() {
+        if (node != null)
+            return node.toString();
+        else
+            return "<null>";
+    }
 }

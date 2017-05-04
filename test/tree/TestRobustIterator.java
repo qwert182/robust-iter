@@ -147,4 +147,30 @@ public class TestRobustIterator extends TestSimpleIterator {
 
         assertEquals(0, tree.size());
     }
+
+    @Test
+    public void doubleCycle() {
+        final int[] arr = new int[] {4, 87, 12, 2, 5};
+        for (int i : arr) tree.add(new Int(i));
+        RobustIterator<Integer, Int> iterator = newIteratorFrom(tree);
+        iterator.reset();
+        final int el = 12;
+
+        while (iterator.isNotDone()) {
+            RobustIterator<Integer, Int> iterator2 = newIteratorFrom(tree);
+            iterator2.reset();
+            while (iterator2.isNotDone()) {
+                if (iterator.getCurrent().getKey() == el) {
+                    tree.remove(el);
+                    break;
+                } else {
+                    if (tree.find(el) == null)
+                        tree.add(new Int(el));
+                }
+                iterator2.next();
+            }
+
+            iterator.next();
+        }
+    }
 }
